@@ -49,7 +49,7 @@ for ix, id in enumerate(imgIds):
                 for seg in ann["segmentation"]:
                     poly = np.array(seg).reshape((int(len(seg) / 2), 2))
                     rr, cc = polygon(poly[:, 1] - 1, poly[:, 0] - 1)
-                    img[rr, cc] = count
+                    img[rr, cc] = ann["category_id"]-1#count
                 count += 1
-
+    
     io.imsave(inst_name, img)
