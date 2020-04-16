@@ -21,8 +21,8 @@ parser.add_argument('--output_label_dir', type=str, default="./train_label/",
 opt = parser.parse_args()
 
 print("annotation file at {}".format(opt.annotation_file))
-print("input img maps at {}".format(opt.input_label_dir))
-print("output dir at {}".format(opt.output_instance_dir))
+print("input img maps at {}".format(opt.input_image_dir))
+print("output dir at {}".format(opt.output_label_dir))
 
 # initialize COCO api for instance annotations
 coco = COCO(opt.annotation_file)
@@ -36,8 +36,8 @@ for ix, id in enumerate(imgIds):
         print("{} / {}".format(ix, len(imgIds)))
     img_dict = coco.loadImgs(id)[0]
     filename = img_dict["file_name"].replace("jpg", "png")
-    label_name = os.path.join(opt.input_label_dir, filename)
-    inst_name = os.path.join(opt.output_instance_dir, filename)
+    label_name = os.path.join(opt.input_image_dir, filename)
+    inst_name = os.path.join(opt.output_label_dir, filename)
     img = io.imread(label_name, as_gray=True)
     img[:,:]=255
     annIds = coco.getAnnIds(imgIds=id, catIds=[], iscrowd=None)
@@ -47,6 +47,8 @@ for ix, id in enumerate(imgIds):
         if type(ann["segmentation"]) == list:
             if "segmentation" in ann:
                 for seg in ann["segmentation"]:
+                    if(len(seg)==0):
+                      continue
                     poly = np.array(seg).reshape((int(len(seg) / 2), 2))
                     rr, cc = polygon(poly[:, 1] - 1, poly[:, 0] - 1)
                     img[rr, cc] = ann["category_id"]-1
